@@ -2,6 +2,12 @@ package com.example;
 
 import java.util.ArrayList;
 
+/**
+ * Készíts egy olyan függvényt, aminek
+ * bemenő paramétere n,
+ * és válaszként kilistázza azokat a számokat 1-től n-ig,
+ * amelyeknek az összes körkörös permutációja prím.
+ */
 public class AllPermutationPrime {
 
     private static boolean isPrime(int n) {        
@@ -18,26 +24,20 @@ public class AllPermutationPrime {
         return prime;
     }
 
-    private static int[] generateCircledPermutations(int n) {
-        String number = String.valueOf(n);
-        int[] permutations = new int[number.length()];
+    private static int[] generateCircledPermutations(int checkedNumber) {
+        String number = String.valueOf(checkedNumber);       
+        int numberOfDigits = number.length();
+        number += number;
+        int[] permutations = new int[numberOfDigits];
+        for (int i = 0; i < numberOfDigits; i++) {
+            permutations[i] = Integer.parseInt(number.substring(i, i + numberOfDigits));
+        }
         return permutations;
     }
 
     public static int[] allCircledPermutationsArePrimes(int n) {
         ArrayList<Integer> goodNumbers = new ArrayList<>();
-        if (n < 2) {
-            return new int[0];
-        }
-        else if (n < 10) {
-            if (isPrime(n)) {
-                return new int[]{n};
-            }
-            else {
-                return new int[0];
-            }
-        }
-        for (int checkedNumber = n; checkedNumber > 1; checkedNumber--) {
+        for (int checkedNumber = 2; checkedNumber <= n; checkedNumber++) {
             int[] permutations = generateCircledPermutations(checkedNumber);
             boolean allPrime = true;
             int index = 0;
@@ -54,7 +54,9 @@ public class AllPermutationPrime {
             }
         }
         int[] goodNumbersArray = new int[goodNumbers.size()];
-        goodNumbers.toArray(goodNumbersArray);
+        for (int i = 0, l = goodNumbers.size(); i < l; i++) {
+            goodNumbersArray[i] = goodNumbers.get(i);
+        }
         return goodNumbersArray;
     }
 }
