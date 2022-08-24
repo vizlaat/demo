@@ -1,6 +1,8 @@
 package com.example;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Készíts egy olyan függvényt, aminek
@@ -12,51 +14,53 @@ public class AllPermutationPrime {
 
     private static boolean isPrime(int n) {        
         boolean prime = true;
-        int divider = n - 1;
-        while ((divider > 1) && prime) {
+        int divider = 2;
+        while ((divider < n) && prime) {
             if (n % divider == 0) {
                 prime = false;
             }
             else {
-                divider--;
+                divider++;
             }
         }
         return prime;
     }
 
-    private static int[] generateCircledPermutations(int checkedNumber) {
-        String number = String.valueOf(checkedNumber);       
-        int numberOfDigits = number.length();
-        number += number;
-        int[] permutations = new int[numberOfDigits];
+    private static boolean isAllPrime(ArrayList<Integer> numbers) {
+        boolean allPrime = true;
+        int index = 0;
+        while ((index < numbers.size()) && allPrime) {
+            if (!isPrime(numbers.get(index))) {
+                allPrime = false;
+            }
+            else {
+                index++;
+            }
+        }
+        return allPrime;
+    }
+
+    private static ArrayList<Integer> generateCircledPermutations(int checkedNumber) {
+        String pattern = String.valueOf(checkedNumber);       
+        int numberOfDigits = pattern.length();
+        pattern += pattern;
+        ArrayList<Integer> permutations = new ArrayList<>();
         for (int i = 0; i < numberOfDigits; i++) {
-            permutations[i] = Integer.parseInt(number.substring(i, i + numberOfDigits));
+            permutations.add(Integer.valueOf(pattern.substring(i, i + numberOfDigits)));
         }
         return permutations;
     }
 
-    public static int[] allCircledPermutationsArePrimes(int n) {
-        ArrayList<Integer> goodNumbers = new ArrayList<>();
+    public static ArrayList<Integer> allCircledPermutationsArePrimes(int n) {
+        ArrayList<Integer> checkedNumbers = new ArrayList<>();
         for (int checkedNumber = 2; checkedNumber <= n; checkedNumber++) {
-            int[] permutations = generateCircledPermutations(checkedNumber);
-            boolean allPrime = true;
-            int index = 0;
-            while ((index < permutations.length) && allPrime) {
-                if (!isPrime(permutations[index])) {
-                    allPrime = false;
-                }
-                else {
-                    index++;
-                }
-            }
-            if (allPrime) {
-                goodNumbers.add(checkedNumber);
-            }
+            checkedNumbers.add(checkedNumber);
         }
-        int[] goodNumbersArray = new int[goodNumbers.size()];
-        for (int i = 0, l = goodNumbers.size(); i < l; i++) {
-            goodNumbersArray[i] = goodNumbers.get(i);
-        }
-        return goodNumbersArray;
+        List<Integer> numbersWithAllTheirCircledPermutationsArePrimes = checkedNumbers.stream()
+            .map((checkedNumber) -> generateCircledPermutations(checkedNumber))
+            .filter((permutations) -> isAllPrime(permutations))
+            .map((permutations) -> permutations.get(0))
+            .collect(Collectors.toList());
+        return new ArrayList<Integer>(numbersWithAllTheirCircledPermutationsArePrimes);
     }
 }
