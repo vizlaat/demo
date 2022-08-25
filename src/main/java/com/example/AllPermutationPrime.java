@@ -3,6 +3,7 @@ package com.example;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Készíts egy olyan függvényt, aminek
@@ -12,10 +13,14 @@ import java.util.stream.Collectors;
  */
 public class AllPermutationPrime {
 
-    private static boolean isPrime(int n) {        
+    public static boolean isPrime(int n) {
+        if (n < 2) {
+            return false;
+        }
         boolean prime = true;
         int divider = 2;
-        while ((divider < n) && prime) {
+        int limit = (int) Math.sqrt(n) + 1;
+        while ((divider < limit) && prime) {
             if (n % divider == 0) {
                 prime = false;
             }
@@ -26,41 +31,22 @@ public class AllPermutationPrime {
         return prime;
     }
 
-    private static boolean isAllPrime(ArrayList<Integer> numbers) {
-        boolean allPrime = true;
-        int index = 0;
-        while ((index < numbers.size()) && allPrime) {
-            if (!isPrime(numbers.get(index))) {
-                allPrime = false;
-            }
-            else {
-                index++;
-            }
-        }
-        return allPrime;
-    }
-
-    private static ArrayList<Integer> generateCircledPermutations(int checkedNumber) {
+    private static List<Integer> generateCircledPermutations(int checkedNumber) {
         String pattern = String.valueOf(checkedNumber);       
         int numberOfDigits = pattern.length();
         pattern += pattern;
-        ArrayList<Integer> permutations = new ArrayList<>();
+        List<Integer> permutations = new ArrayList<>();
         for (int i = 0; i < numberOfDigits; i++) {
             permutations.add(Integer.valueOf(pattern.substring(i, i + numberOfDigits)));
         }
         return permutations;
     }
 
-    public static ArrayList<Integer> allCircledPermutationsArePrimes(int n) {
-        ArrayList<Integer> checkedNumbers = new ArrayList<>();
-        for (int checkedNumber = 2; checkedNumber <= n; checkedNumber++) {
-            checkedNumbers.add(checkedNumber);
-        }
-        List<Integer> numbersWithAllTheirCircledPermutationsArePrimes = checkedNumbers.stream()
-            .map((checkedNumber) -> generateCircledPermutations(checkedNumber))
-            .filter((permutations) -> isAllPrime(permutations))
-            .map((permutations) -> permutations.get(0))
+    public static List<Integer> allCircledPermutationsArePrimes(int n) {
+        return IntStream.rangeClosed(2, n).boxed()
+            .map(AllPermutationPrime::generateCircledPermutations)
+            .filter(permutations -> permutations.stream().allMatch(AllPermutationPrime::isPrime))
+            .map(permutations -> permutations.get(0))
             .collect(Collectors.toList());
-        return new ArrayList<Integer>(numbersWithAllTheirCircledPermutationsArePrimes);
     }
 }
