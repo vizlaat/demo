@@ -13,22 +13,16 @@ import java.util.stream.IntStream;
  */
 public class AllPermutationPrime {
 
-    public static boolean isPrime(int n) {
+    private static boolean isPrime(int n) {
         if (n < 2) {
             return false;
         }
-        boolean prime = true;
         int divider = 2;
         int limit = (int) Math.sqrt(n) + 1;
-        while ((divider < limit) && prime) {
-            if (n % divider == 0) {
-                prime = false;
-            }
-            else {
-                divider++;
-            }
+        while ((divider < limit) && (n % divider > 0)) {
+            divider++;
         }
-        return prime;
+        return divider == limit;
     }
 
     private static List<Integer> generateCircledPermutations(int checkedNumber) {
