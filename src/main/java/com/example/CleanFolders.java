@@ -37,7 +37,10 @@ public class CleanFolders {
 
 	/**
 	 * Returns the collected, deletable .bak files.
+	 * These files should be collected by checkFolder() earlier.
+	 * In case the checkFolder() were not executed earlier, this method returns an empty List.
 	 * Created for opening a safe backdoor for testing purposes.
+	 * @see		#checkFolder(File)
 	 * @return	List<File> of .bak files.
 	 */
 	public static List<File> getDeletableBaks() {
@@ -46,7 +49,10 @@ public class CleanFolders {
 
 	/**
 	 * Returns the collected directories.
+	 * These directories should be collected by checkFolder() earlier.
+	 * In case the checkFolder() were not executed earlier, this method returns an empty List.
 	 * Created for opening a safe backdoor for testing purposes.
+	 * @see		#checkFolder(File)
 	 * @return	List<File> of directories.
 	 */
 	public static List<File> getFolders() {
@@ -80,6 +86,9 @@ public class CleanFolders {
 	 * Recursive method for directories.
 	 * Puts all directories and only deletable files into correspondent Lists.
 	 * Files with .bak extension and without correspondent .doc file, can be deleted.
+	 * The collected folders can be checked by calling getFolders(), the collected .bak files by calling getDeletableBaks().
+	 * @see				#getFolders()
+	 * @see				#getDeletableBaks()
 	 * @param folder	File of processed directory.
 	 */
 	private static void checkFolder(File folder) {
@@ -103,7 +112,6 @@ public class CleanFolders {
 	 * Deletes .bak files without correspondent .doc file next to them, then deletes all empty directories.
 	 */
 	private static void loneBakDelete() {
-		deletableBaks.sort(Comparator.reverseOrder());
 		try {
 			for (File deletableBak : deletableBaks) {
 				if (!deletableBak.delete()) {
@@ -113,6 +121,7 @@ public class CleanFolders {
 		}
 		catch (Exception e) {
 			System.out.println("File deletion was terminated due to exception.");
+			System.out.println(e);
 		}
 		folders.sort(Comparator.reverseOrder());
 		try {
@@ -122,6 +131,7 @@ public class CleanFolders {
 		}
 		catch (Exception e) {
 			System.out.println("Directory deletion was terminated due to exception.");
+			System.out.println(e);
 		}
 	}
 }
