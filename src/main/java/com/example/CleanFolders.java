@@ -1,5 +1,6 @@
 package com.example;
 
+
 import java.io.*;
 import java.util.*;
 import java.util.stream.*;
@@ -42,7 +43,6 @@ public class CleanFolders {
 	//Files with .bak extension and without correspondent .doc file, can be deleted.
 	//Empty folders can be deleted.
 	private static void checkFolder(File folder, List<File> foldersAndFiles) {
-		try {
 			File[] files = folder.listFiles();
 			if ((files != null) && (files.length > 0)) {
 				for (File file : files) {
@@ -54,11 +54,6 @@ public class CleanFolders {
 					}
 				}
 			}
-		}
-		catch (Exception e) {
-			System.out.println("Unable to finish directory scan: " + folder.getPath());
-			System.out.println("" + e);
-		}
 	}
 
 	private static void deleteLoneBaksAndEmptyFolders(List<File> collectedFoldersAndBaks) {

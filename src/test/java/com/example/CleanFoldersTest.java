@@ -1,6 +1,10 @@
 package com.example;
 
 import org.junit.jupiter.api.*;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.verification.VerificationMode;
+
 import static org.junit.Assert.assertEquals;
 
 import java.io.*;
@@ -110,7 +114,7 @@ class CleanFoldersTest {
 
 	@Test
 	void cleanFoldersTest() {
-		CleanFolders.cleanFolders(door);
+//		CleanFolders.cleanFolders(door);
 
 /*
 		List<File> foldersExpected = Arrays.asList(floor, ceiling, question, answer, quest, carpet, painting);
@@ -148,5 +152,112 @@ class CleanFoldersTest {
 		assert !xyz_bak.exists();
 		assert painting.exists();
 		assert aaa_xml.exists();
+	}
+
+
+	@Test
+	public void nothingToClear() {
+		File randomTextFile = Mockito.mock(File.class);
+		Mockito.when(randomTextFile.isDirectory()).thenReturn(false);
+		Mockito.when(randomTextFile.getName()).thenReturn("random-text");
+
+		File entryPoint = Mockito.mock(File.class);
+		Mockito.when(entryPoint.isDirectory()).thenReturn(true);
+		Mockito.when(entryPoint.listFiles()).thenReturn(new File[]{randomTextFile});
+
+		List<File> deletableBaks = CleanFolders.cleanFolders(entryPoint);
+		Assertions.assertEquals(deletableBaks.size(), 0);
+	}
+
+	/*
+	Tested structure:
+	-topLevelDir
+		|-whatever.bak
+	 */
+	@Test
+	public void OneLoneBakInTheTopLevel() {
+		File bakFile = Mockito.mock(File.class);
+		Mockito.when(bakFile.isDirectory()).thenReturn(false);
+		Mockito.when(bakFile.isFile()).thenReturn(true);
+		Mockito.when(bakFile.getPath()).thenReturn("whatever.bak");
+		Mockito.when(bakFile.getName()).thenReturn("whatever.bak");
+
+		File entryPoint = Mockito.mock(File.class);
+		Mockito.when(entryPoint.isDirectory()).thenReturn(true);
+		Mockito.when(entryPoint.listFiles()).thenReturn(new File[]{bakFile});
+
+		List<File> deletableBaks = CleanFolders.cleanFolders(entryPoint);
+		Assertions.assertEquals(deletableBaks.size(), 1);
+
+		Mockito.verify(bakFile, Mockito.times(1)).delete();
+		Mockito.verify(entryPoint, Mockito.never()).delete();
+	}
+
+	/*
+		Tested structure:
+		-topLevelDir
+			|-directory
+		    	|-whatever.bak
+ 	*/
+	@Test
+	public void oneDirectoryOneLoneBak() {
+		File bakFile = Mockito.mock(File.class);
+		Mockito.when(bakFile.isDirectory()).thenReturn(false);
+		Mockito.when(bakFile.isFile()).thenReturn(true);
+		Mockito.when(bakFile.getPath()).thenReturn("whatever.bak");
+		Mockito.when(bakFile.getName()).thenReturn("whatever.bak");
+
+		File directory = Mockito.mock(File.class);
+		Mockito.when(directory.isDirectory()).thenReturn(true);
+		Mockito.when(directory.listFiles()).thenReturn(new File[]{bakFile});
+
+		File entryPoint = Mockito.mock(File.class);
+		Mockito.when(entryPoint.isDirectory()).thenReturn(true);
+		Mockito.when(entryPoint.listFiles()).thenReturn(new File[]{directory});
+
+		List<File> deletableBaks = CleanFolders.cleanFolders(entryPoint);
+		Assertions.assertEquals(deletableBaks.size(), 1);
+
+		Mockito.verify(bakFile, Mockito.times(1)).delete();
+		Mockito.verify(directory, Mockito.times(1)).delete();
+		Mockito.verify(entryPoint, Mockito.never()).delete();
+	}
+
+	/*
+    Tested structure:
+    -topLevelDir
+        |-directory
+            |-whatever.bak
+            |-whatever.doc
+ */
+	@Test
+	public void oneDirectoryWithDocAndBak() {
+		File backFile = Mockito.mock(File.class);
+		Mockito.when(backFile.isDirectory()).thenReturn(false);
+		Mockito.when(backFile.isFile()).thenReturn(true);
+		Mockito.when(backFile.getPath()).thenReturn("whatever.bak");
+		Mockito.when(backFile.getName()).thenReturn("whatever.bak");
+
+		File docFile = Mockito.mock(File.class);
+		Mockito.when(docFile.isDirectory()).thenReturn(false);
+		Mockito.when(docFile.isFile()).thenReturn(true);
+		Mockito.when(docFile.getPath()).thenReturn("whatever.doc");
+		Mockito.when(docFile.getName()).thenReturn("whatever.doc");
+
+		File directory = Mockito.mock(File.class);
+		Mockito.when(directory.isDirectory()).thenReturn(true);
+		Mockito.when(directory.listFiles()).thenReturn(new File[]{backFile, docFile});
+
+		File entryPoint = Mockito.mock(File.class);
+		Mockito.when(entryPoint.isDirectory()).thenReturn(true);
+		Mockito.when(entryPoint.listFiles()).thenReturn(new File[]{directory});
+
+		List<File> deletableBaks = CleanFolders.cleanFolders(entryPoint);
+		Assertions.assertEquals(deletableBaks.size(), 0);
+
+		Mockito.verify(backFile, Mockito.never()).delete();
+		Mockito.verify(docFile, Mockito.never()).delete();
+		Mockito.verify(directory, Mockito.never()).delete();
+		Mockito.verify(entryPoint, Mockito.never()).delete();
 	}
 }
