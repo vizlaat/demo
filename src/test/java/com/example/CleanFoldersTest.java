@@ -1,6 +1,7 @@
 package com.example;
 
 import org.junit.jupiter.api.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.*;
 import java.util.*;
@@ -25,7 +26,8 @@ import java.util.*;
  * 				L aaa.xml
  */
 class CleanFoldersTest {
-	private static final String root = (new File("src\\test\\resources")).getAbsolutePath() + "\\";
+	private static final String fileSeparator = File.separator;
+	private static final String root = (new File("src" + fileSeparator + "test" + fileSeparator + "resources")).getAbsolutePath() + fileSeparator;
 	private static List<File> folders;
 	private static List<File> files;
 
@@ -35,13 +37,13 @@ class CleanFoldersTest {
 	@BeforeAll
 	static void setUp() {
 		door = new File(root + "doOr");
-		floor = new File(root + "doOr\\flooR");
-		question = new File(root + "doOr\\flooR\\questioN");
-		answer = new File(root + "doOr\\flooR\\Answer");
-		quest = new File(root + "doOr\\flooR\\Answer\\Quest");
-		ceiling = new File(root + "doOr\\ceiLing");
-		carpet = new File(root + "doOr\\ceiLing\\carpeT");
-		painting = new File(root + "doOr\\ceiLing\\paintinG");
+		floor = new File(root + "doOr" + fileSeparator + "flooR");
+		question = new File(root + "doOr" + fileSeparator + "flooR" + fileSeparator + "questioN");
+		answer = new File(root + "doOr" + fileSeparator + "flooR" + fileSeparator + "Answer");
+		quest = new File(root + "doOr" + fileSeparator + "flooR" + fileSeparator + "Answer" + fileSeparator + "Quest");
+		ceiling = new File(root + "doOr" + fileSeparator + "ceiLing");
+		carpet = new File(root + "doOr" + fileSeparator + "ceiLing" + fileSeparator + "carpeT");
+		painting = new File(root + "doOr" + fileSeparator + "ceiLing" + fileSeparator + "paintinG");
 		folders = new ArrayList<>(Arrays.asList(door, floor, question, answer, quest, ceiling, carpet, painting));
 		int i = 0;
 		try {
@@ -56,14 +58,14 @@ class CleanFoldersTest {
 			System.out.println("Making directory threw exception: " + folders.get(i));
 			assert false;
 		}
-		abc_doc =  new File(root + "doOr\\flooR\\aBc.doc");
-		abc_bak =  new File(root + "doOr\\flooR\\aBc.bak");
-		cba_bak = new File(root + "doOr\\flooR\\Cba.bak");
-		sss_doc = new File(root + "doOr\\flooR\\ssS.doc");
-		sss_bak = new File(root + "doOr\\flooR\\Sss.bak");
-		teapot_xml = new File(root + "doOr\\flooR\\teapot.xml");
-		xyz_bak = new File(root + "doOr\\ceiLing\\carpeT\\xyz.bak");
-		aaa_xml = new File(root + "doOr\\ceiLing\\paintinG\\aaa.xml");
+		abc_doc =  new File(root + "doOr" + fileSeparator + "flooR" + fileSeparator + "aBc.doc");
+		abc_bak =  new File(root + "doOr" + fileSeparator + "flooR" + fileSeparator + "aBc.bak");
+		cba_bak = new File(root + "doOr" + fileSeparator + "flooR" + fileSeparator + "Cba.bak");
+		sss_doc = new File(root + "doOr" + fileSeparator + "flooR" + fileSeparator + "ssS.doc");
+		sss_bak = new File(root + "doOr" + fileSeparator + "flooR" + fileSeparator + "Sss.bak");
+		teapot_xml = new File(root + "doOr" + fileSeparator + "flooR" + fileSeparator + "teapot.xml");
+		xyz_bak = new File(root + "doOr" + fileSeparator + "ceiLing" + fileSeparator + "carpeT" + fileSeparator + "xyz.bak");
+		aaa_xml = new File(root + "doOr" + fileSeparator + "ceiLing" + fileSeparator + "paintinG" + fileSeparator + "aaa.xml");
 		files = new ArrayList<>(Arrays.asList(abc_doc, abc_bak, cba_bak, sss_doc, sss_bak, teapot_xml, xyz_bak, aaa_xml));
 		i = 0;
 		try {
@@ -90,7 +92,7 @@ class CleanFoldersTest {
 			}
 		}
 		catch (Exception e) {
-			System.out.println("Deleting file threw exception: " + files.get(i));
+			System.out.println("File deletion threw exception: " + files.get(i));
 			assert false;
 		}
 		i = folders.size() - 1;
@@ -101,15 +103,16 @@ class CleanFoldersTest {
 			}
 		}
 		catch (Exception e) {
-			System.out.println("Deleting directory threw exception: " + folders.get(i));
+			System.out.println("Directory deletion threw exception: " + folders.get(i));
 			assert false;
 		}
 	}
 
 	@Test
-	void bakDeletionTest() {
-		CleanFolders.bakDeletion(door);
+	void cleanFoldersTest() {
+		CleanFolders.cleanFolders(door);
 
+/*
 		List<File> foldersExpected = Arrays.asList(floor, ceiling, question, answer, quest, carpet, painting);
 		foldersExpected.sort(Comparator.naturalOrder());
 		List<File> foldersActual = CleanFolders.getFolders();
@@ -121,7 +124,14 @@ class CleanFoldersTest {
 		List<File> filesActual = CleanFolders.getDeletableBaks();
 		filesActual.sort(Comparator.naturalOrder());
 		Assertions.assertEquals(filesExpected, filesActual);
-
+*/
+		List<File> expectedCollectedDeletableFiles = Arrays.asList(cba_bak, xyz_bak);
+		expectedCollectedDeletableFiles.sort(Comparator.naturalOrder());
+		System.out.println("Expected: " + expectedCollectedDeletableFiles.size());
+		List<File> actualCollectedDeletableFiles = CleanFolders.cleanFolders(door);
+		actualCollectedDeletableFiles.sort(Comparator.naturalOrder());
+		System.out.println("Actual: " + actualCollectedDeletableFiles.size());
+		Assertions.assertEquals(expectedCollectedDeletableFiles, actualCollectedDeletableFiles);
 		assert door.exists();
 		assert floor.exists();
 		assert abc_doc.exists();
