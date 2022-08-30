@@ -85,9 +85,7 @@ class CleanFoldersTest {
 		int i = 0;
 		try {
 			while (i < files.size()) {
-				if (!files.get(i).delete()) {
-					System.out.println("Failed to delete file: " + files.get(i).getPath());
-				}
+				files.get(i).delete();
 				i++;
 			}
 		}
@@ -98,9 +96,7 @@ class CleanFoldersTest {
 		i = folders.size() - 1;
 		try {
 			while (i > -1) {
-				if (!folders.get(i).delete()) {
-					System.out.println("Failed to delete directory: " + folders.get(i).getPath());
-				}
+				folders.get(i).delete();
 				i--;
 			}
 		}
