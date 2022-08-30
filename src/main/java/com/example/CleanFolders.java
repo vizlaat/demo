@@ -2,6 +2,7 @@ package com.example;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.*;
 
 /**
  * Egy könyvtárstruktúrában dokumentumokat szerkesztenek.
@@ -22,116 +23,109 @@ import java.util.*;
  * Megoldásként Java nyelvű forráskódot várunk (tetszőleges Java verzió használható).
  */
 public class CleanFolders {
-	private static final List<File> deletableBaks = new ArrayList<>();
-	private static final List<File> folders = new ArrayList<>();
-
-	/**
-	 * Detects directories under the given directory and collects all .bak files without corresponding .doc files next to them.
-	 * The method uses checkFolder() for detection and loneBakDelete() for deletion.
-	 * @param startFolder	File of the starting directory.
-	 */
-	public static void bakDeletion(File startFolder) {
-		checkFolder(startFolder);
-		loneBakDelete();
+	public static List<File> cleanFolders(File startFolder) {
+		List<File> collectedFoldersAndBaks = new ArrayList<>();
+		checkFolder(startFolder, collectedFoldersAndBaks);
+		List<File> loneBaks = collectedFoldersAndBaks.stream()
+						.filter(File::isFile)
+						.collect(Collectors.toList());
+		deleteLoneBaksAndEmptyFolders(collectedFoldersAndBaks);
+		return loneBaks;
 	}
 
-	/**
-	 * Returns the collected, deletable .bak files.
-	 * These files should be collected by checkFolder() earlier.
-	 * In case the checkFolder() were not executed earlier, this method returns an empty List.
-	 * Created for opening a safe backdoor for testing purposes.
-	 * @see		#checkFolder(File)
-	 * @return	List<File> of .bak files.
-	 */
-	public static List<File> getDeletableBaks() {
-		return deletableBaks;
-	}
-
-	/**
-	 * Returns the collected directories.
-	 * These directories should be collected by checkFolder() earlier.
-	 * In case the checkFolder() were not executed earlier, this method returns an empty List.
-	 * Created for opening a safe backdoor for testing purposes.
-	 * @see		#checkFolder(File)
-	 * @return	List<File> of directories.
-	 */
-	public static List<File> getFolders() {
-		return folders;
-	}
-
-	/**
-	 * Helper method for directory stream filtering and collecting.
-	 * Also, launching the next recursive method call of checkFolder().
-	 * @param file	File of processed folder.
-	 */
-	private static void folderHelper(File file) {
-		folders.add(file);
-		checkFolder(file);
-	}
-
-	/**
-	 * Helper method for file filtering.
-	 * @param file	File of processed file.
-	 * @return		boolean value marks whether the checked file can be deleted.
-	 */
 	private static boolean isDeletableBak(File file) {
 		String path = file.getPath();
-		return file.isFile() &&
-				file.getName().endsWith(".bak") &&
+		return file.getName().endsWith(".bak") &&
 				!(new File(path.substring(0, path.length() - 4) + ".doc")).exists();
 	}
 
-	/**
-	 * Processes directories and files in a directory.
-	 * Recursive method for directories.
-	 * Puts all directories and only deletable files into correspondent Lists.
-	 * Files with .bak extension and without correspondent .doc file, can be deleted.
-	 * The collected folders can be checked by calling getFolders(), the collected .bak files by calling getDeletableBaks().
-	 * @see				#getFolders()
-	 * @see				#getDeletableBaks()
-	 * @param folder	File of processed directory.
-	 */
-	private static void checkFolder(File folder) {
+	//Files with .bak extension and without correspondent .doc file, can be deleted.
+	//Empty folders can be deleted.
+	private static void checkFolder(File folder, List<File> foldersAndFiles) {
 		try {
 			File[] files = folder.listFiles();
 			if ((files != null) && (files.length > 0)) {
-				Arrays.stream(files)
-						.filter(File::isDirectory)
-						.forEach(CleanFolders::folderHelper);
-				Arrays.stream(files)
-						.filter(CleanFolders::isDeletableBak)
-						.forEach(CleanFolders.deletableBaks::add);
-			}
-		}
-		catch (Exception e) {
-			//
-		}
-	}
-
-	/**
-	 * Deletes .bak files without correspondent .doc file next to them, then deletes all empty directories.
-	 */
-	private static void loneBakDelete() {
-		try {
-			for (File deletableBak : deletableBaks) {
-				if (!deletableBak.delete()) {
-					System.out.println("Unsuccessful deletion: " + deletableBak.getPath());
+				for (File file : files) {
+					if (file.isDirectory() || CleanFolders.isDeletableBak(file)) {
+						foldersAndFiles.add(file);
+						if (file.isDirectory()) {
+							checkFolder(file, foldersAndFiles);
+						}
+					}
 				}
 			}
 		}
 		catch (Exception e) {
-			System.out.println("File deletion was terminated due to exception.");
-			System.out.println(e);
-		}
-		folders.sort(Comparator.reverseOrder());
-		try {
-			for (File folder : folders) {
-				folder.delete();
-			}
-		}
-		catch (Exception e) {
-			System.out.println("Directory deletion was terminated due to exception.");
-			System.out.println(e);
+			System.out.println("Unable to finish directory scan: " + folder.getPath());
+			System.out.println("" + e);
 		}
 	}
+
+	private static void deleteLoneBaksAndEmptyFolders(List<File> collectedFoldersAndBaks) {
+		collectedFoldersAndBaks.sort(Comparator.reverseOrder());
+		collectedFoldersAndBaks
+				.forEach(file -> {
+					try {
+						if (file.isFile() && !file.delete()) {
+							System.out.println("File deletion was unsuccessful: " + file.getPath());
+						}
+						else {
+							file.delete();
+						}
+					}
+					catch (Exception e) {
+						if (file.isFile()) {
+							System.out.println("File deletion was terminated: " + file.getPath());
+						}
+						else {
+							System.out.println("Unable to access directory: " + file.getPath());
+						}
+						System.out.println(e);
+					}
+				});
+/*
+		int activeThreads = 0;
+		int maxThreads = 10;
+		int index = deletableBaks.size() - 1;
+		while (index > 0) {
+			if (activeThreads < maxThreads) {
+				File actualBak = deletableBaks.get(index);
+				index--;
+				activeThreads++;
+				createNewThread(actualBak);
+			}
+		}
+		folders.sort(Comparator.naturalOrder());
+		index = folders.size() - 1;
+		while (index > 0) {
+			if (activeThreads < maxThreads) {
+				File actualFolder = folders.get(index);
+				index--;
+				activeThreads++;
+				createNewThread(actualFolder);
+			}
+		}
+*/
+	}
+
+/*
+	private static void createNewThread(File toDelete) {
+		Thread newThread = new Thread() {
+			@Override
+			public void run() {
+				try {
+					if (!toDelete.delete()) {
+						System.out.println("Unsuccessful deletion: " + toDelete.getPath());
+					}
+				}
+				catch (Exception e) {
+					System.out.println("Deletion threw an exception: " + toDelete.getPath());
+					System.out.println(e);
+				}
+				activeThreads--;
+			}
+		};
+		newThread.start();
+	}
+*/
 }
