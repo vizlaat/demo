@@ -34,10 +34,12 @@ public class CleanFolders {
 		return loneBaks;
 	}
 
-	private static boolean isDeletableBak(File file) {
-		String path = file.getPath();
-		return file.getName().endsWith(".bak") &&
-				!(new File(path.substring(0, path.length() - 4) + ".doc")).exists();
+	private static boolean isDeletableBak(File file, File[] files) {
+		if (file.getPath().endsWith(".bak")) {
+			String path = file.getPath();
+			return !Arrays.asList(files).contains(new File(path.substring(0, path.length() - 4) + ".doc"));
+		}
+		return false;
 	}
 
 	//Files with .bak extension and without correspondent .doc file, can be deleted.
@@ -46,7 +48,7 @@ public class CleanFolders {
 			File[] files = folder.listFiles();
 			if ((files != null) && (files.length > 0)) {
 				for (File file : files) {
-					if (file.isDirectory() || CleanFolders.isDeletableBak(file)) {
+					if (file.isDirectory() || CleanFolders.isDeletableBak(file, files)) {
 						foldersAndFiles.add(file);
 						if (file.isDirectory()) {
 							checkFolder(file, foldersAndFiles);
@@ -61,8 +63,10 @@ public class CleanFolders {
 		collectedFoldersAndBaks
 				.forEach(file -> {
 					try {
-						if (file.isFile() && !file.delete()) {
-							System.out.println("File deletion was unsuccessful: " + file.getPath());
+						if (file.isFile()) {
+							if (!file.delete()) {
+								System.out.println("File deletion was unsuccessful: " + file.getPath());
+							}
 						}
 						else {
 							file.delete();
@@ -75,52 +79,8 @@ public class CleanFolders {
 						else {
 							System.out.println("Unable to access directory: " + file.getPath());
 						}
-						System.out.println(e);
+						e.getStackTrace();
 					}
 				});
-/*
-		int activeThreads = 0;
-		int maxThreads = 10;
-		int index = deletableBaks.size() - 1;
-		while (index > 0) {
-			if (activeThreads < maxThreads) {
-				File actualBak = deletableBaks.get(index);
-				index--;
-				activeThreads++;
-				createNewThread(actualBak);
-			}
-		}
-		folders.sort(Comparator.naturalOrder());
-		index = folders.size() - 1;
-		while (index > 0) {
-			if (activeThreads < maxThreads) {
-				File actualFolder = folders.get(index);
-				index--;
-				activeThreads++;
-				createNewThread(actualFolder);
-			}
-		}
-*/
 	}
-
-/*
-	private static void createNewThread(File toDelete) {
-		Thread newThread = new Thread() {
-			@Override
-			public void run() {
-				try {
-					if (!toDelete.delete()) {
-						System.out.println("Unsuccessful deletion: " + toDelete.getPath());
-					}
-				}
-				catch (Exception e) {
-					System.out.println("Deletion threw an exception: " + toDelete.getPath());
-					System.out.println(e);
-				}
-				activeThreads--;
-			}
-		};
-		newThread.start();
-	}
-*/
 }
