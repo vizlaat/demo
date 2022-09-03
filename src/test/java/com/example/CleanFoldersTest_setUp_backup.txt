@@ -1,0 +1,116 @@
+		//door
+		door = Mockito.mock(File.class);
+		when(door.getName()).thenReturn("doOr");
+		when(door.getPath()).thenReturn("c:\\doOr");
+		when(door.getParent()).thenReturn("c:");
+		when(door.isDirectory()).thenReturn(true);
+		when(door.isFile()).thenReturn(false);
+		floor = Mockito.mock(File.class);
+		when(floor.getName()).thenReturn("flooR");
+		when(floor.getPath()).thenReturn("c:\\doOr\\flooR");
+		when(floor.getParent()).thenReturn("c:\\doOr");
+		when(floor.isDirectory()).thenReturn(true);
+		when(floor.isFile()).thenReturn(false);
+		ceiling = Mockito.mock(File.class);
+		when(ceiling.getName()).thenReturn("ceiLing");
+		when(ceiling.getPath()).thenReturn("c:\\doOr\\ceiLing");
+		when(ceiling.getParent()).thenReturn("c:\\doOr");
+		when(ceiling.isDirectory()).thenReturn(true);
+		when(ceiling.isFile()).thenReturn(false);
+		when(door.listFiles()).thenReturn(new File[]{floor, ceiling});
+
+		//doOr/flooR
+		abc_doc = Mockito.mock(File.class);
+		when(abc_doc.getName()).thenReturn("aBc.doc");
+		when(abc_doc.getPath()).thenReturn("c:\\doOr\\flooR\\aBc.doc");
+		when(abc_doc.getParent()).thenReturn("c:\\doOr\\flooR");
+		when(abc_doc.isDirectory()).thenReturn(false);
+		when(abc_doc.isFile()).thenReturn(true);
+		abc_bak = Mockito.mock(File.class);
+		when(abc_bak.getName()).thenReturn("aBc.bak");
+		when(abc_bak.getPath()).thenReturn("c:\\doOr\\flooR\\aBc.bak");
+		when(abc_bak.getParent()).thenReturn("c:\\doOr\\flooR");
+		when(abc_bak.isDirectory()).thenReturn(false);
+		when(abc_bak.isFile()).thenReturn(true);
+		cba_bak = Mockito.mock(File.class);
+		when(cba_bak.getName()).thenReturn("Cba.bak");
+		when(cba_bak.getPath()).thenReturn("c:\\doOr\\flooR\\Cba.bak");
+		when(cba_bak.getParent()).thenReturn("c:\\doOr\\flooR");
+		when(cba_bak.isDirectory()).thenReturn(false);
+		when(cba_bak.isFile()).thenReturn(true);
+		sss_doc = Mockito.mock(File.class);
+		when(sss_doc.getName()).thenReturn("ssS.doc");
+		when(sss_doc.getPath()).thenReturn("c:\\doOr\\flooR\\ssS.doc");
+		when(sss_doc.getParent()).thenReturn("c:\\doOr\\flooR");
+		when(sss_doc.isDirectory()).thenReturn(false);
+		when(sss_doc.isFile()).thenReturn(true);
+		sss_bak = Mockito.mock(File.class);
+		when(sss_bak.getName()).thenReturn("Sss.bak");
+		when(sss_bak.getPath()).thenReturn("c:\\doOr\\flooR\\Sss.bak");
+		when(sss_bak.getParent()).thenReturn("c:\\doOr\\flooR");
+		when(sss_bak.isDirectory()).thenReturn(false);
+		when(sss_bak.isFile()).thenReturn(true);
+		teapot_xml = Mockito.mock(File.class);
+		when(teapot_xml.getName()).thenReturn("teapot.xml");
+		when(teapot_xml.getPath()).thenReturn("c:\\doOr\\flooR\\teapot.xml");
+		when(teapot_xml.getParent()).thenReturn("c:\\doOr\\flooR");
+		when(teapot_xml.isDirectory()).thenReturn(false);
+		when(teapot_xml.isFile()).thenReturn(true);
+		question = Mockito.mock(File.class);
+		when(question.getName()).thenReturn("questioN");
+		when(question.getPath()).thenReturn("c:\\doOr\\flooR\\questioN");
+		when(question.getParent()).thenReturn("c:\\doOr\\flooR");
+		when(question.isDirectory()).thenReturn(true);
+		when(question.isFile()).thenReturn(false);
+		answer = Mockito.mock(File.class);
+		when(answer.getName()).thenReturn("Answer");
+		when(answer.getPath()).thenReturn("c:\\doOr\\flooR\\Answer");
+		when(answer.getParent()).thenReturn("c:\\doOr\\flooR");
+		when(answer.isDirectory()).thenReturn(true);
+		when(answer.isFile()).thenReturn(false);
+		when(floor.listFiles()).thenReturn(new File[]{abc_doc, abc_bak, cba_bak, sss_doc, sss_bak, teapot_xml, question, answer});
+
+		//doOr/flooR/questioN
+		when(question.listFiles()).thenReturn(new File[]{});
+
+		//doOr/flooR/Answer
+		quest = Mockito.mock(File.class);
+		when(quest.getName()).thenReturn("Quest");
+		when(quest.getPath()).thenReturn("c:\\doOr\\flooR\\Answer\\Quest");
+		when(quest.getParent()).thenReturn("c:\\doOr\\flooR\\Answer");
+		when(quest.isDirectory()).thenReturn(true);
+		when(quest.isFile()).thenReturn(false);
+		when(answer.listFiles()).thenReturn(new File[]{quest});
+
+		//doOr/ceiLing
+		carpet = Mockito.mock(File.class);
+		when(carpet.getName()).thenReturn("carpeT");
+		when(carpet.getPath()).thenReturn("c:\\doOr\\ceiLing\\carpeT");
+		when(carpet.getParent()).thenReturn("c:\\doOr\\ceiLing");
+		when(carpet.isDirectory()).thenReturn(true);
+		when(carpet.isFile()).thenReturn(false);
+		painting = Mockito.mock(File.class);
+		when(painting.getName()).thenReturn("paintinG");
+		when(painting.getPath()).thenReturn("c:\\doOr\\ceiLing\\paintinG");
+		when(painting.getParent()).thenReturn("c:\\doOr\\ceiLing");
+		when(painting.isDirectory()).thenReturn(true);
+		when(painting.isFile()).thenReturn(false);
+		when(ceiling.listFiles()).thenReturn(new File[]{carpet, painting});
+
+		//doOr/ceiLing/carpeT
+		xyz_bak = Mockito.mock(File.class);
+		when(xyz_bak.getName()).thenReturn("xyz.bak");
+		when(xyz_bak.getPath()).thenReturn("c:\\doOr\\ceiLing\\carpeT\\xyz.bak");
+		when(xyz_bak.getParent()).thenReturn("c:\\doOr\\ceiLing\\carpeT");
+		when(xyz_bak.isDirectory()).thenReturn(false);
+		when(xyz_bak.isFile()).thenReturn(true);
+		when(carpet.listFiles()).thenReturn(new File[]{xyz_bak});
+
+		//doOr/ceiLing/paintinG
+		aaa_xml = Mockito.mock(File.class);
+		when(aaa_xml.getName()).thenReturn("aaa.xml");
+		when(aaa_xml.getPath()).thenReturn("c:\\doOr\\ceiLing\\paintinG\\aaa.xml");
+		when(aaa_xml.getParent()).thenReturn("c:\\doOr\\ceiLing\\paintinG");
+		when(aaa_xml.isDirectory()).thenReturn(false);
+		when(aaa_xml.isFile()).thenReturn(true);
+		when(painting.listFiles()).thenReturn(new File[]{aaa_xml});
